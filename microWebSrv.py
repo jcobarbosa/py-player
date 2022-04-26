@@ -93,6 +93,7 @@ class MicroWebSrv :
 
     @classmethod
     def route(cls, url, method='GET'):
+        print('add route {0}'.format(url))
         """ Adds a route handler function to the routing list """
         def route_decorator(func):
             item = (url, method, func)
@@ -170,12 +171,14 @@ class MicroWebSrv :
                   routeHandlers = [],
                   port          = 80,
                   bindIP        = '0.0.0.0',
-                  webPath       = "/flash/www" ) :
+                  webPath       = "/flash/www",
+                  networkUtil   = None) :
 
         self._srvAddr       = (bindIP, port)
         self._webPath       = webPath
         self._notFoundUrl   = None
         self._started       = False
+        self.networkUtil       = networkUtil
 
         self.MaxWebSocketRecvLen        = 1024
         self.WebSocketThreaded          = True
@@ -262,6 +265,7 @@ class MicroWebSrv :
     # ----------------------------------------------------------------------------
     
     def GetRouteHandler(self, resUrl, method) :
+        print('resUrl {0}'.format(resUrl))
         if self._routeHandlers :
             #resUrl = resUrl.upper()
             if resUrl.endswith('/') :

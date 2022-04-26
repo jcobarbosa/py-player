@@ -18,19 +18,26 @@ class WebServer():
     self.webSocket.RecvBinaryCallback = _recvBinaryCallback
     self.webSocket.ClosedCallback 	 = _closedCallback
 
-  def start_server(self):
-    self.srv = MicroWebSrv(webPath='www/', port=8080, bindIP='0.0.0.0')
+  def start_server(self, networkUtil) :
+    self.srv = MicroWebSrv(webPath='www/', port=8181, bindIP='0.0.0.0', networkUtil=networkUtil)
     self.srv.MaxWebSocketRecvLen = 256
-    self.srv.WebSocketThreaded = False
-    self.srv.AcceptWebSocketCallback = _acceptWebSocketCallback
-    self.srv.Start()
+    self.srv.WebSocketThreaded = True
+    self.srv.AcceptWebSocketCallback = self._acceptWebSocketCallback
+    self.srv.Start(threaded=True)
+
+  @MicroWebSrv.route('/init')
+  def _httpHandlerInitGet(self, httpClient, httpResponse):
+    self.oledDisplay.clear()
+    self.oledDisplay.log('init', 0, 25)
 
   @MicroWebSrv.route('/')
-  def _httpHandlerTestGet(self, httpClient, httpResponse):
-    if (self.networkUtil.is_sta_active()):
-      content = """\
-      <!DOCTYPE html>
-      <html lang=en>
+  def _httpHandlerTestGet(self, httpResponse):
+    print('passsaaaaaa')
+    print(str(self.srv))
+    if (self.srv.networkUtil.isWifiApActive()):
+        content = """\
+        <!DOCTYPE html>
+        <html lang=en>
         <head>
           <meta charset='UTF-8' />
          <title>TEST GET</title>
@@ -45,12 +52,13 @@ class WebServer():
             <input type='submit' value='Submit'>
           </form>
         </body>
-      </html>
-      """ % httpClient.GetIPAddr()
-      httpResponse.WriteResponseOk( headers		 = None,
+        </html>
+        """ % self.GetIPAddr()
+        httpResponse.WriteResponseOk( headers		 = None,
                                     contentType	 = 'text/html',
                                     contentCharset = 'UTF-8',
                                     content 		 = content )
-  def __init__(self, networkUtil):
+  def __init__(self, networkUtil, oledDisplay):
     self.networkUtil = networkUtil
-    _thread.start_new_thread(self.start_server, ())
+    self.oledDisplay = oledDisplay
+    self.start_server(networkUtil)

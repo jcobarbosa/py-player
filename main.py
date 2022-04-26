@@ -23,7 +23,8 @@ oledDisplay.startLoading(20)
 
 networkUtil = NetworkUtil(oledDisplay, database)
 
-WebServer(networkUtil)
+WebServer(networkUtil, oledDisplay)
+oledDisplay.clear()
 oledDisplay.log('Webserver iniciado!', 0, 25)
 
 # for audio in audioList:

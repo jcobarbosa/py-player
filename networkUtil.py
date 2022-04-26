@@ -7,13 +7,13 @@ global server_socket
 retryCount = 0
 maxRetry = 5
 
-wifi_pa_username = 'admin'
+wifi_pa_ssid = 'encarte-01'
 wifi_pa_password = '12345678'
 
 class NetworkUtil:
 
   def __init__(self, oledDisplay, database):
-    self.addr = socket.getaddrinfo('0.0.0.0', 8080)[0][-1]
+    # self.addr = socket.getaddrinfo('0.0.0.0', 8080)[0][-1]
     self.wlan_sta = network.WLAN(network.STA_IF)
     self.wlan_ap = network.WLAN(network.AP_IF)
 
@@ -86,13 +86,13 @@ class NetworkUtil:
 
   def startWifiAp(self):
     if self.initWifiAp():
-      self.wlan_ap.config(essid = wifi_pa_username, password = wifi_pa_password, authmode = 3)
+      self.wlan_ap.config(essid = wifi_pa_ssid, password = wifi_pa_password, authmode = 3)
+      print(self.wlan_ap.ifconfig())
 
       self.oledDisplay.clear()
-      self.oledDisplay.log('Acesse: http://', 0, 5)
-      self.oledDisplay.log('192.192.24.1', 0, 15)
-      self.oledDisplay.log('Usu./Senha: ', 0, 25)
-      self.oledDisplay.log('{0} / {1}'.format(wifi_pa_username, wifi_pa_password), 0, 35)
+      self.oledDisplay.log('Conecte em:', 0, 5)
+      self.oledDisplay.log('SSID: {0}'.format(wifi_pa_ssid), 0, 15)
+      self.oledDisplay.log('Senha: {0}'.format(wifi_pa_password), 0, 25)
 
   def getWifiCredentials(self):
     self.wifi_ssid = self.database.getWifiSsid()
