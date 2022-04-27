@@ -26,38 +26,66 @@ class WebServer():
     self.srv.Start(threaded=True)
 
   @MicroWebSrv.route('/init')
-  def _httpHandlerInitGet(self, httpClient, httpResponse):
+  def _httpHandlerInitGet(httpClient, httpResponse):
     self.oledDisplay.clear()
     self.oledDisplay.log('init', 0, 25)
 
   @MicroWebSrv.route('/')
-  def _httpHandlerTestGet(self, httpResponse):
-    print('passsaaaaaa')
-    print(str(self.srv))
-    if (self.srv.networkUtil.isWifiApActive()):
-        content = """\
-        <!DOCTYPE html>
-        <html lang=en>
-        <head>
-          <meta charset='UTF-8' />
-         <title>TEST GET</title>
-        </head>
-        <body>
-          <h1>TEST GET</h1>
-          Client IP address = %s
-          <br />
-          <form action='/test' method='post' accept-charset='ISO-8859-1'>
-            First name: <input type='text' name='firstname'><br />
-            Last name: <input type='text' name='lastname'><br />
-            <input type='submit' value='Submit'>
-          </form>
-        </body>
-        </html>
-        """ % self.GetIPAddr()
-        httpResponse.WriteResponseOk( headers		 = None,
+  def _httpHandlerTestGet(httpClient, httpResponse):
+    _webserver = httpClient._microWebSrv
+    if (_webserver.networkUtil.isWifiApActive()):
+      content = """\
+      <!DOCTYPE html>
+      <html lang=en>
+      <head>
+        <meta charset='UTF-8' />
+        <title>Inicial - Configurar Wifi</title>
+      </head>
+      <body>
+        <form id="formWifi"><input type="submit" value="Atualizar" /></form>
+        <form>
+        <h1>Redes disponíveis:</h1>
+        <table>
+          <thead>
+            <tr>
+              <th>&nbsp;</th>
+              <th>Channel</th>
+              <th>SSID</th>
+              <th>RSSI</th>
+              <th>Autenticação</th>
+            </tr>
+          </thead>
+          <tbody>
+            %s
+          </tbody>
+        </table>
+        <br />
+        <label for="pwd" id="pwd-label" style="display:none">Senha:</label> <input type="password" id="pwd" name="pwd" style="display:none" />
+        <br />
+        <button onclick="event.preventDefault();enviar()";>Salvar</button>
+        </form>
+        <script type="text/javascript">
+            function selecionarWifi() {
+                document.getElementById('pwd').style.display = 'inherit';
+                document.getElementById('pwd-label').style.display = 'inherit';
+            }
+            
+            function enviar() {
+                if (document.getElementById('pwd').value.trim() === '') {
+                    alert('Favor informar a senha de acesso!');
+                } else {
+                    document.getElementById('formWifi').submit();
+                }
+            }
+        </script>
+      </body>
+      </html>
+      """ % _webserver.networkUtil.listNearbyWifiNetworks()
+      httpResponse.WriteResponseOk( headers		 = None,
                                     contentType	 = 'text/html',
                                     contentCharset = 'UTF-8',
                                     content 		 = content )
+
   def __init__(self, networkUtil, oledDisplay):
     self.networkUtil = networkUtil
     self.oledDisplay = oledDisplay

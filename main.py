@@ -25,7 +25,7 @@ networkUtil = NetworkUtil(oledDisplay, database)
 
 WebServer(networkUtil, oledDisplay)
 oledDisplay.clear()
-oledDisplay.log('Webserver iniciado!', 0, 25)
+oledDisplay.log('Webserver!!', 0, 25)
 
 # for audio in audioList:
 #   oledDisplay.clear()

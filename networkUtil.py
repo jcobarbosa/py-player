@@ -22,6 +22,16 @@ class NetworkUtil:
 
     self.connect()
 
+  def listNearbyWifiNetworks(self):
+    self.wlan_sta.active(True)
+    availableNetworks = self.wlan_sta.scan()
+    AUTHMODE = {0: "open", 1: "WEP", 2: "WPA-PSK", 3: "WPA2-PSK", 4: "WPA/WPA2-PSK"}
+    networksList = ''
+    for ssid, bssid, channel, rssi, authmode, hidden in sorted(availableNetworks, key=lambda x: x[3], reverse=True):
+        networksList += '<tr><td><input type="radio" onclick="selecionarWifi();" name="ssid" value="{1}"></td><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>'.format(channel, ssid, rssi, AUTHMODE.get(authmode, '?'))
+
+    return networksList
+
   def initWifiSta(self):
     retryCount = 0
     while not self.wlan_sta.active() and maxRetry > retryCount:
